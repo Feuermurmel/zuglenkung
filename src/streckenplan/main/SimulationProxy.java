@@ -68,7 +68,7 @@ final class SimulationProxy {
 		return res;
 	}
 	
-	private static Map<String, String> alternateKeyNames = new HashMap<String, String>();
+	private static final Map<String, String> alternateKeyNames = new HashMap<String, String>();
 	
 	static {
 		alternateKeyNames.put("⇧", "shift");

@@ -55,11 +55,7 @@ local function setupSignal(signal)
 				end)
 			end)
 		else
-			print('track')
-			
 			local function checkField(track)
-				print('field')
-				
 				local nextTrack = track.getEndEdge().getActiveTrack()
 				
 				nextTrack.getField().awaitState('free', function ()
@@ -79,7 +75,7 @@ local function setupSignal(signal)
 end
 
 for i = 1, #tracks do
-	if i % 4 == 1 then
+	if i % 5 == 0 then
 		setupSignal(tracks[i].addSignal('dwarf'))
 	end
 
