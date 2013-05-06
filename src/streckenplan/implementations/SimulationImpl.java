@@ -5,7 +5,7 @@ import java.util.*;
 import streckenplan.interfaces.*;
 import streckenplan.sched.Scheduler;
 import streckenplan.sched.Schedulers;
-import view.Steppable;
+import streckenplan.sched.Steppable;
 import view.painter.Paintable;
 
 final class SimulationImpl implements Simulation {

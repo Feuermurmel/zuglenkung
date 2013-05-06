@@ -3,9 +3,9 @@ package util;
 public class MathUtil {
 	private MathUtil() {
 	}
-	
+
 	public static final double tau = Math.PI * 2;
-	
+
 	public static int mod(int x, int divisor) {
 		int rem = x % divisor;
 

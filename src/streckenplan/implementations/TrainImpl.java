@@ -5,7 +5,7 @@ import java.util.*;
 import streckenplan.interfaces.Aspect;
 import streckenplan.interfaces.Car;
 import streckenplan.interfaces.Train;
-import view.Steppable;
+import streckenplan.sched.Steppable;
 import view.painter.Paintable;
 import view.painter.Painter;
 

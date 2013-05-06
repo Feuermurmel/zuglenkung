@@ -1,6 +1,6 @@
 package streckenplan.implementations;
 
-import view.Steppable;
+import streckenplan.sched.Steppable;
 
 final class Engine implements Steppable {
 	private final double maxPowerPerMass;

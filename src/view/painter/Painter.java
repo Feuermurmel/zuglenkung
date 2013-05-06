@@ -8,17 +8,23 @@ import java.util.List;
 
 import types.Color;
 import types.Vector2d;
-import view.site.ZoneListener;
 
 public interface Painter {
 	void draw(Color paint, Stroke stroke, Shape... shapes);
+
 	void draw(Color paint, Stroke stroke, List<Shape> shapes);
+
 	void fill(Color paint, Shape... shapes);
+
 	void fill(Color paint, List<Shape> shapes);
-	void zone(Shape shape, ZoneListener listener);
+
 	Painter transformed(AffineTransform transform);
+
 	Painter translated(Vector2d vector);
+
 	Painter rotated(double angle);
+
 	Painter scaled(double factor);
+
 	Rectangle2D getBounds();
 }

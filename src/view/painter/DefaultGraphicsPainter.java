@@ -2,11 +2,13 @@ package view.painter;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.util.*;
+import java.util.List;
 
 import types.Color;
-import view.InteractiveView;
+import types.Vector2d;
 
-public final class DefaultGraphicsPainter extends AbstractGraphicsPainter {
+public final class DefaultGraphicsPainter implements Painter {
 	private final Context context;
 	private final AffineTransform transform;
 
@@ -35,8 +37,7 @@ public final class DefaultGraphicsPainter extends AbstractGraphicsPainter {
 		}
 	}
 
-	@Override
-	protected Graphics2D getGraphics(Color color) {
+	private Graphics2D getGraphics(Color color) {
 		checkContext();
 
 		context.graphics.setPaint(color.asAWTColor());
@@ -44,24 +45,13 @@ public final class DefaultGraphicsPainter extends AbstractGraphicsPainter {
 		return context.graphics;
 	}
 
-	@Override
-	protected Graphics2D getGraphics(Color color, Stroke stroke) {
+	private Graphics2D getGraphics(Color color, Stroke stroke) {
 		checkContext();
 
 		context.graphics.setPaint(color.asAWTColor());
 		context.graphics.setStroke(stroke);
 		
 		return context.graphics;
-	}
-
-	@Override
-	protected ZoneContext getZoneContext() {
-		return context.zones;
-	}
-
-	@Override
-	protected AffineTransform getTransform() {
-		return context.transform;
 	}
 
 	private void checkContext() {
@@ -71,22 +61,66 @@ public final class DefaultGraphicsPainter extends AbstractGraphicsPainter {
 		}
 	}
 
-	public static Painter create(Graphics2D graphics, InteractiveView.ZoneContext zoneContext) {
-		return new DefaultGraphicsPainter(new Context(graphics, zoneContext), new AffineTransform());
+	public static Painter create(Graphics2D graphics) {
+		return new DefaultGraphicsPainter(new Context(graphics), new AffineTransform());
 	}
 
-	public static Painter create(Graphics2D graphics) {
-		return create(graphics, null);
+	@Override
+	public void draw(Color paint, Stroke stroke, java.util.List<Shape> shapes) {
+		Graphics2D g = getGraphics(paint, stroke);
+
+		for (Shape i : shapes)
+			g.draw(i);
+	}
+
+	@Override
+	public void fill(Color paint, List<Shape> shapes) {
+		Graphics2D g = getGraphics(paint);
+
+		for (Shape i : shapes)
+			g.fill(i);
+	}
+
+	// This would support sub-pixel anti-aliasing (only with -Dapple.awt.graphics.UseQuartz=true which may degrade performance substantially) but character placement is not as precise as with ShapeUtil.text()
+	public void text(Vector2d position, Font font, Color color, String text) {
+		Graphics g = getGraphics(color);
+		
+		g.setFont(font);
+		
+		g.drawString(text, (int) Math.round(position.x), (int) Math.round(position.y));
+	}
+
+	@Override
+	public void draw(Color paint, Stroke stroke, Shape... shapes) {
+		draw(paint, stroke, Arrays.asList(shapes));
+	}
+
+	@Override
+	public void fill(Color paint, Shape... shapes) {
+		fill(paint, Arrays.asList(shapes));
+	}
+
+	@Override
+	public Painter translated(Vector2d vector) {
+		return transformed(AffineTransform.getTranslateInstance(vector.x, vector.y));
+	}
+
+	@Override
+	public Painter rotated(double angle) {
+		return transformed(AffineTransform.getRotateInstance(angle));
+	}
+
+	@Override
+	public Painter scaled(double factor) {
+		return transformed(AffineTransform.getScaleInstance(factor, factor));
 	}
 
 	private static final class Context {
 		public AffineTransform transform = null;
 		public final Graphics2D graphics;
-		public final InteractiveView.ZoneContext zones;
 
-		public Context(Graphics2D graphics, InteractiveView.ZoneContext zones) {
+		private Context(Graphics2D graphics) {
 			this.graphics = graphics;
-			this.zones = zones;
 		}
 	}
 }

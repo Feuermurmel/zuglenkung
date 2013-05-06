@@ -59,7 +59,7 @@ final class CarImpl implements Car, Paintable {
 		currentOrientation = Orientation2d.create(center, angle);
 	}
 
-	private static final Stroke borderStroke = StrokeUtil.basic(1f / 32);
+	private static final Stroke borderStroke = StrokeUtil.basic(1f / 32, StrokeUtil.Cap.butt, StrokeUtil.Join.miter);
 	private static final Color borderColor = Color.black;
 	private static final Color fillColor = Color.blue.brighten(.7f);
 	private static final Color crashedFillColor = Color.red.darken(0.2f);

@@ -28,10 +28,6 @@ public class ShapeUtil {
 	}
 
 	public static Shape line(Vector2d p1, Vector2d p2) {
-		// FIXME: Find a better way handle near-invisible shapes. This is not resolution independent
-		//if (p2.sub(p1).length() < 1)
-		//	return new Polygon();
-
 		return new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
 	}
 

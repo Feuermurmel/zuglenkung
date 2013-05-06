@@ -9,7 +9,7 @@ import streckenplan.interfaces.*;
 import streckenplan.sched.Scheduler;
 import types.*;
 import util.MathUtil;
-import view.Steppable;
+import streckenplan.sched.Steppable;
 import view.painter.Paintable;
 import view.painter.Painter;
 

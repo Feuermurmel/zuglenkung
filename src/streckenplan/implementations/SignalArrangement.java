@@ -1,14 +1,9 @@
 package streckenplan.implementations;
 
-import java.awt.Stroke;
-import java.awt.geom.Path2D;
 import java.util.*;
 
-import types.Vector2d;
 import streckenplan.interfaces.*;
 import types.*;
-import util.ShapeUtil;
-import util.StrokeUtil;
 import view.painter.Painter;
 
 abstract class SignalArrangement {
@@ -43,8 +38,8 @@ abstract class SignalArrangement {
 		for (Direction i : Direction.values()) {
 			for (int j = -1; j < 2; j += 1) {
 				Direction limitExitAngle = i.turn(j);
-				
-				dwarfSignals.put(Tuples.tuple(i, limitExitAngle), new Dwarf(i, limitExitAngle));
+
+				dwarfSignals.put(Tuples.tuple(i, limitExitAngle), new DwarfSignalArrangement(i, limitExitAngle));
 			}
 		}
 	}
@@ -61,74 +56,4 @@ abstract class SignalArrangement {
 	}
 
 	public abstract void paint(Painter p, Aspect currentAspect);
-
-	private static final class Dwarf extends SignalArrangement {
-		private final double offset;
-		private final double angle;
-
-		private Dwarf(Direction limitEntryAngle, Direction limitExitAngle) {
-			super(limitEntryAngle, limitExitAngle);
-			
-			int range = limitExitAngle.diff(limitEntryAngle.turn(-4)); // Number of tracks edges in the signals affecting range.
-			
-			angle = Direction.turnRangeMidAngle(limitEntryAngle.reverse(), limitExitAngle);
-
-			if (range == 3)
-				offset = .11;
-			else if (range == 4)
-				offset = .25;
-			else if (range == 5)
-				offset = .36;
-			else
-				throw new AssertionError();
-		}
-
-		@Override
-		public void paint(Painter p, Aspect aspect) {
-			// TODO: Use aspect here
-			float u = 1f / 24;
-			Painter p2 = p.rotated(angle).translated(Vector2d.create(-offset, -u / 2));
-			Stroke stroke = StrokeUtil.basic(u);
-			Path2D.Double path = new Path2D.Double();
-			
-			path.moveTo(-u * 2, 0);
-			path.lineTo(u * 2, 0);
-			path.lineTo(u * 2, u * 1.75);
-			path.lineTo(-u * .25, u * 4);
-			path.lineTo(-u * 2, u * 4);
-			path.closePath();
-
-			p2.fill(Color.black, path);
-			p2.draw(Color.black, stroke,
-				ShapeUtil.line(Vector2d.create(-u * 2, -u * 2), Vector2d.create(u * 2, -u * 2)),
-				ShapeUtil.line(Vector2d.create(0, -u * 2), Vector2d.create(0, u)));
-			
-			float r = u * .6f;
-			Color color = Color.yellow.brighten(.8f);
-			
-			boolean topLeft = false;
-			boolean bottomLeft = false;
-			boolean bottomRight = false;
-			
-			if (aspect.speed > 0) {
-				topLeft = true;
-				bottomLeft = true;
-			} else if (aspect.distance > 0) {
-				topLeft = true;
-				bottomRight = true;
-			} else {
-				bottomLeft = true;
-				bottomRight = true;
-			}
-			
-			if (topLeft)
-				p2.fill(color, ShapeUtil.circle(Vector2d.create(-u, 3 * u), r)); // Top left light
-			
-			if (bottomLeft)
-				p2.fill(color, ShapeUtil.circle(Vector2d.create(-u, u), r)); // Bottom left light
-			
-			if (bottomRight)
-				p2.fill(color, ShapeUtil.circle(Vector2d.create(u, u), r)); // Bottom right Light
-		}
-	}
 }

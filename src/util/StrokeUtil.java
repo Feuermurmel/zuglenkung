@@ -3,12 +3,14 @@ package util;
 import java.awt.BasicStroke;
 import java.awt.Stroke;
 
+import org.jetbrains.annotations.Nullable;
+
 public class StrokeUtil {
 	private StrokeUtil() {
 	}
 
-	@SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-	public static Stroke basic(float width, Cap cap, Join join, float[] pattern) {
+	@SuppressWarnings("MagicConstant")
+	public static Stroke basic(float width, Cap cap, Join join, @Nullable float[] pattern) {
 		return new BasicStroke(width, cap.magic, join.magic, 10, pattern, 0f);
 	}
 	
@@ -20,7 +22,7 @@ public class StrokeUtil {
 		return basic(width, cap, join, null);
 	}
 
-	public static Stroke basic(float width, float[] pattern) {
+	public static Stroke basic(float width, @Nullable float[] pattern) {
 		return basic(width, Cap.butt, Join.round, pattern);
 	}
 

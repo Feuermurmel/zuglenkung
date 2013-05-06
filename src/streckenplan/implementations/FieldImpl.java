@@ -95,7 +95,7 @@ final class FieldImpl implements Field {
 	@Override
 	public Track addTrack(Direction startDirection, Direction endDirection) {
 		// TODO: Check for overlap
-		int diff = endDirection.diff(startDirection);
+		int diff = endDirection.minus(startDirection);
 		TrackArrangement arrangement;
 
 		if (diff == 5)

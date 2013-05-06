@@ -15,7 +15,7 @@ local addTurnaround = function()
 end
 
 local haltAspect = { distance = 0, speed = 0 }
-local fahrtAspect = { distance = 100, speed = 0 }
+local fahrtAspect = { distance = 0, speed = .4 }
 
 addTrack('straight')
 addTrack('straight')
@@ -28,14 +28,14 @@ addTrack('straight')
 addTurnaround()
 
 
-center.getNeighbour('ru', 1).getNeighbour('r', 2).getEdge('l').addTrack('curve-left').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-left')
-
-center.getNeighbour('ru', 1).getNeighbour('r', 13).getEdge('l').addTrack('curve-left').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-left')
-
-for i = 1, 20 do
-	center.getNeighbour('ru', 2).getNeighbour('l', 2).getNeighbour('r', i).getEdge('l').addTrack('straight')
-	center.getNeighbour('ru', 1).getNeighbour('l', 1).getNeighbour('r', i).getEdge('l').addTrack('straight')
-end
+--center.getNeighbour('ru', 1).getNeighbour('r', 2).getEdge('l').addTrack('curve-left').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-left')
+--
+--center.getNeighbour('ru', 1).getNeighbour('r', 13).getEdge('l').addTrack('curve-left').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-right').getEndEdge().addTrack('curve-left')
+--
+--for i = 1, 20 do
+--	center.getNeighbour('ru', 2).getNeighbour('l', 2).getNeighbour('r', i).getEdge('l').addTrack('straight')
+--	center.getNeighbour('ru', 1).getNeighbour('l', 1).getNeighbour('r', i).getEdge('l').addTrack('straight')
+--end
 
 local function setupSignal(signal)
 	local tracks = signal.getAffectedTracks()
@@ -43,7 +43,7 @@ local function setupSignal(signal)
 	
 	local function checkTrack(i)
 		if i > #tracks then
-			print('go')
+			--print('go')
 			
 			signal.setAspect(fahrtAspect)
 			
@@ -74,10 +74,15 @@ local function setupSignal(signal)
 	checkTrack(1);
 end
 
+
+for _, i in ipairs({ 20, 2, 4, 6, 10, 12, 14, 16 }) do
+	setupSignal(tracks[i].addSignal('dwarf'))
+end
+
 for i = 1, #tracks do
-	if i % 5 == 0 then
-		setupSignal(tracks[i].addSignal('dwarf'))
-	end
+	--if i % 3 == 0 then
+	--	setupSignal(tracks[i].addSignal('dwarf'))
+	--end
 
 	--if i % 4 == 0 then
 	--	tracks[i].reverse().addSignal('dwarf')
@@ -92,4 +97,26 @@ for i = 1, #tracks do
 end
 
 
+(function ()
+	local tracks = { }
+
+	for i = 1, 19 do
+		tracks[i] = center.getNeighbour('ru', 2).getNeighbour('r', i - 2).getEdge('l').addTrack('straight')
+	end
+
+	tracks[2].addTrain(.8).setTargetSpeed(1.6)
+	tracks[8].addSignal('dwarf').setAspect({ distance = 0, speed = .4 })
+	tracks[12].addSignal('dwarf').setAspect({ distance = 0, speed = 0 })
+end)();
+
+--(function ()
+--	local tracks = { }
+--
+--	for i = 1, 10 do
+--		tracks[i] = center.getNeighbour('ru', 0).getNeighbour('r', i - 1).getEdge('l').addTrack('straight')
+--	end
+--
+--	--tracks[7].addSignal('dwarf').setAspect({ distance = 0, speed = 0 })
+--	tracks[2].addTrain(.8).setTargetSpeed(2)
+--end)()
 

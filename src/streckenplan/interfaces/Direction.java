@@ -23,16 +23,11 @@ public enum Direction {
 		return turn(3);
 	}
 	
-	public int diff(Direction other) {
+	public int minus(Direction other) {
 		return MathUtil.mod(ordinal() - other.ordinal(), 6);
-	}
-	
-	/** Returns the angle that is in the middle between start and end, inside the range from start to end. */
-	public static double turnRangeMidAngle(Direction start, Direction end) {
-		return turnAngle(MathUtil.mod(start.ordinal() + MathUtil.mod(end.ordinal(), 6, start.ordinal()), 12)) / 2;
 	}
 
 	private static double turnAngle(int turns) {
-		return turns * Math.PI / 3;
+		return turns * MathUtil.tau / 6;
 	}
 }

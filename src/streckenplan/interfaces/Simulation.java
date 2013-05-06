@@ -1,6 +1,6 @@
 package streckenplan.interfaces;
 
-import view.Steppable;
+import streckenplan.sched.Steppable;
 import view.painter.Paintable;
 
 public interface Simulation extends Steppable {
