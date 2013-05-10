@@ -37,23 +37,23 @@ final class SimpleSystemNHauptsignalSignalArrangement extends SignalArrangement 
 	@Override
 	public void paint(Painter p, Aspect currentAspect) {
 		float u = 1f / 24;
-		Painter p2 = p.rotated(angle).translated(create(-offset, u * 2));
+		Painter p2 = p.rotated(angle).translated(create(-offset, 0));
 		Stroke stroke = StrokeUtil.basic(u);
 
 		p2.fill(black,
 				polygon(
-						create(-.75 * u, 1.25 * u),
-						create(-1.25 * u, .75 * u),
-						create(-1.25 * u, (-4 - .75) * u),
-						create(-.75 * u, (-4 - 1.25) * u),
-						create(.75 * u, (-4 - 1.25) * u),
-						create(1.25 * u, (-4 - .75) * u),
-						create(1.25 * u, .75 * u),
-						create(.75 * u, 1.25 * u)));
+						create(-.75 * u, (1.25 + 4) * u),
+						create(-1.25 * u, (.75 + 4) * u),
+						create(-1.25 * u, -.75 * u),
+						create(-.75 * u, -1.25 * u),
+						create(.75 * u, -1.25 * u),
+						create(1.25 * u, -.75 * u),
+						create(1.25 * u, (.75 + 4) * u),
+						create(.75 * u, (1.25 + 4) * u)));
 
-		//p2.draw(black, stroke,
-		//	line(create(-u * 1.5, -u * 2), create(u * 1.5, -u * 2)),
-		//	line(create(0, -u * 2), create(0, u)));
+		p2.draw(black, stroke,
+			line(create(-u * 1.5, -u * 4), create(u * 1.5, -u * 4)),
+			line(create(0, -u * 4), create(0, -1.25 * u)));
 
 		float r = u * .6f;
 		Color offColor = gray(.2f);
@@ -76,7 +76,7 @@ final class SimpleSystemNHauptsignalSignalArrangement extends SignalArrangement 
 		}
 
 		for (int i = 0; i < lamps.length; i += 1) {
-			p2.fill(lamps[i] ? colors[i] : offColor, circle(create(0, -i * 2 * u), r));
+			p2.fill(lamps[i] ? colors[i] : offColor, circle(create(0, (lamps.length - i - 1) * 2 * u), r));
 		}
 	}
 }

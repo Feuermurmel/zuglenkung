@@ -2,6 +2,8 @@ package util;
 
 import java.util.Comparator;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ComparatorUtil {
 	private ComparatorUtil() {
 	}
@@ -35,7 +37,7 @@ public class ComparatorUtil {
 		protected KeyComparator() {
 			this(new Comparator<K>() {
 				@Override
-				public int compare(K o1, K o2) {
+				public int compare(@NotNull K o1, @NotNull K o2) {
 					return o1.compareTo(o2);
 				}
 			});
@@ -44,7 +46,7 @@ public class ComparatorUtil {
 		public abstract K getKey(T value);
 
 		@Override
-		public final int compare(T o1, T o2) {
+		public final int compare(@NotNull T o1, @NotNull T o2) {
 			return keyComparator.compare(getKey(o1), getKey(o2));
 		}
 	}

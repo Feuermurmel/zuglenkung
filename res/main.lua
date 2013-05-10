@@ -1,31 +1,45 @@
 local center = layout.getCenterField()
-local tracks = { center.getNeighbour('ru', 6).getEdge('l').addTrack('straight') }
-
-local addTrack = function(type)
-	table.insert(tracks, tracks[#tracks].getEndEdge().addTrack(type))
-end
-
-local addTurnaround = function()
-	addTrack('straight')
-	addTrack('curve-right')
-	addTrack('curve-right')
-	addTrack('curve-right')
-	addTrack('curve-right')
-	addTrack('curve-left')
-end
+local tracks = { }
 
 local haltAspect = { distance = 0, speed = 0 }
 local fahrtAspect = { distance = 0, speed = .4 }
 
-addTrack('straight')
-addTrack('straight')
-addTrack('straight')
-addTurnaround()
-addTrack('straight')
-addTrack('straight')
-addTrack('straight')
-addTrack('straight')
-addTurnaround()
+do
+	local currentEdge = center.getNeighbour('ru', 2).getNeighbour('r', 2).getEdge('l')
+	
+	local addTrack = function(type)
+		local newTrack = currentEdge.addTrack(type)
+		
+		currentEdge = newTrack.getEndEdge()
+		
+		table.insert(tracks, newTrack)
+	end
+	
+	local addTurnaround = function()
+		addTrack('straight')
+		addTrack('curve-right')
+		addTrack('curve-right')
+		addTrack('curve-right')
+		addTrack('curve-right')
+		addTrack('curve-left')
+	end
+	
+	for i = 1, 10 do
+		addTrack('straight')
+	end
+	
+	addTurnaround()
+	
+	for i = 1, 10 do
+		addTrack('straight')
+	end
+	
+	addTurnaround()
+end
+
+--divert('straight', divert('curve-left', 'curve-right', 'curve-right', 'curve-left'), 'straight', 'straight', 'straight')
+--
+--'s[lrrl]sss'
 
 
 local function previousTrack(track)
@@ -54,27 +68,28 @@ local function manageTrain(track, safeDistanceFn)
 		local nextTrack = nextTrack(track)
 		local done = false
 
-		simulation.schedule(.5, function ()
-			manageTrain(nextTrack, function (safeDistance)
-				if not done then
-					safeDistanceFn(safeDistance + 1)
+		manageTrain(nextTrack, function (safeDistance)
+			if not done then
+				safeDistanceFn(safeDistance + 1)
 
-					if affectingSignal then
-						print('distance', safeDistance)
-						affectingSignal.setAspect({ distance = 0, speed = maxSpeedForDistance(safeDistance) })
-					end
+				if affectingSignal then
+					print('distance', safeDistance)
+					affectingSignal.setAspect({ distance = 0, speed = maxSpeedForDistance(safeDistance) })
 				end
-			end)
+			end
 		end)
-		
+
 		if affectingSignal then
 			print('halt')
 			affectingSignal.setAspect(haltAspect)
 			safeDistanceFn(1)
 		end
+		
+		simulation.setColor(track, { 1, 1, 0 })
 
 		track.getField().awaitState('occupied', function ()
 			track.getField().awaitState('free', function ()
+				simulation.setColor(track, { 1, 1, 1 })
 				done = true
 			end)
 		end)
@@ -108,17 +123,17 @@ for _, i in ipairs({ 1, 7 }) do
 	manageTrain(nextTrack(track), function () end)
 end
 
-do
-	local tracks = { }
-
-	for i = 1, 40 do
-		tracks[i] = center.getNeighbour('ru', 2).getNeighbour('r', i - 2).getEdge('l').addTrack('straight')
-	end
-
-	tracks[2].addTrain(.8).setTargetSpeed(1.0)
-	tracks[12].addSignal('dwarf').setAspect({ distance = 0, speed = .4 })
-	tracks[16].addSignal('dwarf').setAspect({ distance = 0, speed = 0 })
-end
+--do
+--	local tracks = { }
+--
+--	for i = 1, 40 do
+--		tracks[i] = center.getNeighbour('ru', 2).getNeighbour('r', i - 2).getEdge('l').addTrack('straight')
+--	end
+--
+--	tracks[2].addTrain(.8).setTargetSpeed(1.0)
+--	tracks[12].addSignal('dwarf').setAspect({ distance = 0, speed = .4 })
+--	tracks[16].addSignal('dwarf').setAspect({ distance = 0, speed = 0 })
+--end
 
 --(function ()
 --	local tracks = { }

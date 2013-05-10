@@ -8,6 +8,7 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 import streckenplan.api.Simulation;
+import streckenplan.api.Track;
 import types.Color;
 
 import static org.luaj.vm2.LuaValue.*;
@@ -36,17 +37,17 @@ final class SimulationProxyImpl implements SimulationProxy {
 			}
 		});
 
-		//res.set("setColor", new TwoArgFunction() {
-		//	@Override
-		//	public LuaValue call(LuaValue arg1, LuaValue arg2) {
-		//		Track track = Proxies.getAssociatedValue(arg1, Track.class);
-		//		Color color = colorFromTable(arg2);
-		//		
-		//		track.setColor(color);
-		//		
-		//		return NIL;
-		//	}
-		//});
+		res.set("setColor", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue arg2) {
+				Track track = Proxies.getAssociatedValue(arg1, Track.class);
+				Color color = colorFromTable(arg2);
+				
+				track.setColor(color);
+				
+				return NIL;
+			}
+		});
 
 		res.set("schedule", new TwoArgFunction() {
 			@Override

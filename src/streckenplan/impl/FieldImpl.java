@@ -5,12 +5,10 @@ import java.util.*;
 import org.jetbrains.annotations.Nullable;
 import streckenplan.api.*;
 import streckenplan.sched.Scheduler;
-import types.Tuple;
-import types.Vector2d;
+import types.*;
+import util.ComparatorUtil;
 import util.MathUtil;
 import view.painter.Painter;
-
-import static types.Tuples.*;
 
 final class FieldImpl implements Field {
 	private final Scheduler scheduler;
@@ -18,7 +16,7 @@ final class FieldImpl implements Field {
 	private final int column;
 	private final int row;
 	private final Map<SignalArrangement, SignalImpl> signalsByArrangement = new HashMap<SignalArrangement, SignalImpl>();
-	private final Map<TrackArrangement, Tuple<TrackImpl, TrackImpl>> tracksByArrangement = new HashMap<TrackArrangement, Tuple<TrackImpl, TrackImpl>>();
+	private final HashMap<TrackArrangement, TrackArrangementInstance> trackArrangementInstances = new HashMap<TrackArrangement, TrackArrangementInstance>();
 
 	private SwitchState switchState = new PassiveSwitchState(null);
 	private Map<TrackImpl, List<SignalImpl>> affectingSignalsByTrack = Collections.emptyMap();
@@ -33,38 +31,25 @@ final class FieldImpl implements Field {
 	}
 
 	public void paint(Painter p) {
-		// Layer 2
-
-		//TrackType activeSegment;
-		//
-		//if (tracks.size() > 1)
-		//	activeSegment = this.activeSegment;
-		//else
-		//	activeSegment = null;
-		//
-		for (TrackArrangement i : tracksByArrangement.keySet())
-		//	if (i != activeSegment)
-		{
+		for (TrackArrangement i : trackArrangementInstances.keySet())
 			i.paintBorder(p);
-		}
-
-		for (TrackArrangement i : tracksByArrangement.keySet())
-		//if (i != activeSegment)
-		{
-			i.paintFill(p);
-		}
-		//
-		//if (activeSegment != null) {
-		//	activeSegment.paintBorder(p);
-		//	activeSegment.paintFill(p);
-		//	activeSegment.paintActiveIndicator(p);
-		//}
+		
+		List<Map.Entry<TrackArrangement, TrackArrangementInstance>> trackArrangements = new ArrayList<Map.Entry<TrackArrangement, TrackArrangementInstance>>(trackArrangementInstances.entrySet());
+		
+		Collections.sort(trackArrangements, new ComparatorUtil.KeyComparator<Map.Entry<TrackArrangement, TrackArrangementInstance>, Float>() {
+			@Override
+			public Float getKey(Map.Entry<TrackArrangement, TrackArrangementInstance> value) {
+				return -value.getValue().color.getBrightness();
+			}
+		});
+		
+		for (Map.Entry<TrackArrangement, TrackArrangementInstance> i : trackArrangements)
+			i.getKey().paintFill(p, i.getValue().color);
 
 		switchState.paint(p);
 
-		for (SignalImpl i : signalsByArrangement.values()) {
+		for (SignalImpl i : signalsByArrangement.values())
 			i.paint(p);
-		}
 	}
 
 	public Vector2d getPosition() {
@@ -133,7 +118,8 @@ final class FieldImpl implements Field {
 		TrackImpl forward = new TrackImpl(this, arrangement, false);
 		TrackImpl reverse = new TrackImpl(this, arrangement, true);
 
-		tracksByArrangement.put(arrangement, tuple(forward, reverse));
+		trackArrangementInstances.put(arrangement, new TrackArrangementInstance(forward, reverse));
+		
 		updateCachedTrackData();
 
 		if (reversed)
@@ -154,15 +140,15 @@ final class FieldImpl implements Field {
 		if (activeArrangement == null) {
 			return null;
 		} else {
-			Tuple<TrackImpl, TrackImpl> trackTuple = tracksByArrangement.get(activeArrangement);
+			TrackArrangementInstance arrangementInstance = trackArrangementInstances.get(activeArrangement);
 
 			if (activeArrangement.getStartDirection() == startDirection) {
-				return trackTuple.element1;
+				return arrangementInstance.forwardTrack;
 			} else {
 				Direction endDirection = activeArrangement.getEndDirection();
 
 				if (endDirection != null && endDirection.reverse() == startDirection)
-					return trackTuple.element2;
+					return arrangementInstance.reverseTrack;
 				else
 					return null;
 			}
@@ -198,9 +184,9 @@ final class FieldImpl implements Field {
 
 		List<TrackImpl> tracks = new ArrayList<TrackImpl>();
 
-		for (Tuple<TrackImpl, TrackImpl> i : tracksByArrangement.values()) {
-			tracks.add(i.element1);
-			tracks.add(i.element2);
+		for (TrackArrangementInstance i : trackArrangementInstances.values()) {
+			tracks.add(i.forwardTrack);
+			tracks.add(i.reverseTrack);
 		}
 
 		for (TrackImpl track : tracks) {
@@ -241,12 +227,16 @@ final class FieldImpl implements Field {
 	}
 
 	public TrackImpl getTrackForArrangement(TrackArrangement arrangement, boolean reversed) {
-		Tuple<TrackImpl, TrackImpl> trackTuple = tracksByArrangement.get(arrangement);
+		TrackArrangementInstance arrangementInstance = trackArrangementInstances.get(arrangement);
 
 		if (reversed)
-			return trackTuple.element2;
+			return arrangementInstance.reverseTrack;
 		else
-			return trackTuple.element1;
+			return arrangementInstance.forwardTrack;
+	}
+
+	public void setColorForArrangement(TrackArrangement arrangements, Color color) {
+		trackArrangementInstances.get(arrangements).color = color;
 	}
 
 	private abstract static class SwitchState {
@@ -283,7 +273,7 @@ final class FieldImpl implements Field {
 
 		@Override
 		public void paint(Painter p) {
-			if (arrangement != null && tracksByArrangement.size() > 1)
+			if (arrangement != null && trackArrangementInstances.size() > 1)
 				arrangement.paintActiveIndicator(p);
 		}
 	}
@@ -319,6 +309,17 @@ final class FieldImpl implements Field {
 		@Override
 		public TrackArrangement getActiveArrangement() {
 			return null;
+		}
+	}
+	
+	private static final class TrackArrangementInstance {
+		private final TrackImpl forwardTrack;
+		private final TrackImpl reverseTrack;
+		private Color color = Color.white;
+
+		private TrackArrangementInstance(TrackImpl forwardTrack, TrackImpl reverseTrack) {
+			this.forwardTrack = forwardTrack;
+			this.reverseTrack = reverseTrack;
 		}
 	}
 }

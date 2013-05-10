@@ -3,6 +3,7 @@ package streckenplan.api;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
+import types.Color;
 
 public interface Track {
 	Track reverse();
@@ -30,4 +31,6 @@ public interface Track {
 	Train addTrain(double engineCarLength);
 
 	Signal addSignal(SignalType type);
+
+	void setColor(Color color);
 }

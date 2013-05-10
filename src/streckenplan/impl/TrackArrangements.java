@@ -30,7 +30,7 @@ final class TrackArrangements {
 	private static final Stroke fahrstrasseStroke = StrokeUtil.basic(3 / 8f);
 
 	private static final Color borderColor = Color.black;
-	private static final Color fillColor = Color.white;
+	//private static final Color fillColor = Color.white;
 	private static final Color activeIndicatorColor = Color.blue;
 	private static final Color fahrstrasseColor = Color.create(1, 1, .3f);
 
@@ -118,8 +118,8 @@ final class TrackArrangements {
 		}
 
 		@Override
-		public void paintFill(Painter p) {
-			p.draw(fillColor, fillStroke, shape);
+		public void paintFill(Painter p, Color color) {
+			p.draw(color, fillStroke, shape);
 		}
 
 		@Override
@@ -173,8 +173,8 @@ final class TrackArrangements {
 		}
 
 		@Override
-		public void paintFill(Painter p) {
-			p.draw(fillColor, fillStroke, shape);
+		public void paintFill(Painter p, Color color) {
+			p.draw(color, fillStroke, shape);
 		}
 
 		@Override
@@ -219,11 +219,11 @@ final class TrackArrangements {
 		}
 
 		@Override
-		public void paintFill(Painter p) {
+		public void paintFill(Painter p, Color color) {
 			Painter p2 = p.rotated(startDirection.angle);
 
 			p2.draw(borderColor, borderStroke, ShapeUtil.line(Vector2d.create(.5, 0), Vector2d.create(.5 - length - 1f / 16 / 5 * 6, 0)));
-			p2.draw(fillColor, fillStroke, ShapeUtil.line(Vector2d.create(.5, 0), Vector2d.create(.5 - length, 0)));
+			p2.draw(color, fillStroke, ShapeUtil.line(Vector2d.create(.5, 0), Vector2d.create(.5 - length, 0)));
 		}
 
 		@Override

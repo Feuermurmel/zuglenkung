@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 import streckenplan.api.*;
+import types.Color;
 import types.Vector2d;
 
 final class TrackImpl implements Track {
@@ -117,6 +118,11 @@ final class TrackImpl implements Track {
 		return field.addSignal(limitEntryDirection, limitExitDirection, type);
 	}
 
+	@Override
+	public void setColor(Color color) {
+		field.setColorForArrangement(arrangement, color);
+	}
+
 	public double length() {
 		return arrangement.getLength();
 	}
@@ -128,9 +134,5 @@ final class TrackImpl implements Track {
 	@Override
 	public String toString() {
 		return String.format("TrackImpl(field = %s, arrangement = %s, reversed = %s)", field, arrangement, reversed);
-	}
-
-	public TrackArrangement getArrangement() {
-		return arrangement;
 	}
 }

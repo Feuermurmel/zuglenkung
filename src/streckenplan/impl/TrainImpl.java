@@ -27,6 +27,9 @@ final class TrainImpl implements Train, Steppable, Paintable {
 		engine = new Engine(1. / 25);
 
 		updateCarOrientations();
+
+		if (crashed)
+			throw new IllegalArgumentException();
 	}
 
 	@Override
@@ -67,7 +70,7 @@ final class TrainImpl implements Train, Steppable, Paintable {
 
 		Orientation2d orientation = cars.get(0).getCurrentOrientation();
 
-		if (MathUtil.mod(orientation.angle + tau / 4, tau) > tau / 2)
+		if (mod(orientation.angle + tau / 4, tau) > tau / 2)
 			orientation = orientation.rotate(tau / 2);
 
 		Font font = FontUtil.font("Helvetica Neue", 1);
@@ -93,6 +96,9 @@ final class TrainImpl implements Train, Steppable, Paintable {
 
 		cars.add(car);
 		updateCarOrientations();
+
+		if (crashed)
+			throw new IllegalArgumentException();
 
 		return car;
 	}

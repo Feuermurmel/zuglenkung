@@ -61,6 +61,10 @@ public final class Color {
 	public java.awt.Color asAWTColor() {
 		return new java.awt.Color(r, g, b);
 	}
+	
+	public float getBrightness() {
+		return (r + g + b) / 3;
+	}
 
 	public static Color gray(float b) {
 		return create(b, b, b);
