@@ -45,7 +45,7 @@ final class LayoutImpl implements Paintable, Layout, Steppable {
 				if (field != null && trainsOccupyingField.containsKey(field))
 					fieldPainter.fill(occupiedColor, fieldShape);
 
-				fieldPainter.draw(Color.black, basic(1f / 64), fieldBorderShape);
+				fieldPainter.draw(Color.black, basic(1f / 64), fieldBorderLines);
 
 				if (field != null)
 					field.paint(fieldPainter);
@@ -184,7 +184,7 @@ final class LayoutImpl implements Paintable, Layout, Steppable {
 	private static final double fieldHeightRatio = Math.sqrt(3) / 2;
 	private static final Color occupiedColor = Color.red.brighten(.7f);
 	private static final Shape fieldShape;
-	private static final Shape fieldBorderShape;
+	private static final Shape[] fieldBorderLines;
 
 	static {
 		List<Vector2d> vertices = new ArrayList<Vector2d>();
@@ -194,7 +194,14 @@ final class LayoutImpl implements Paintable, Layout, Steppable {
 		}
 
 		fieldShape = polygon(vertices);
-		fieldBorderShape = line(vertices.subList(2, 6)); // These vertices are "before" the field, in order they are painted. Thus painting these after the field background color paint them above the background of adjacent fields.
+		
+		List<Shape> fieldBorderLines2 = new ArrayList<Shape>();
+		
+		// These vertices are "before" the field, in order they are painted. Thus painting these after the field background color paint them above the background of adjacent fields.
+		for (int i = 2; i < 5; i += 1)
+			fieldBorderLines2.add(line(vertices.get(i), vertices.get(i + 1)));
+		
+		fieldBorderLines = fieldBorderLines2.toArray(new Shape[0]);
 	}
 
 	public static Vector2d positionOfField(int column, int row) {
