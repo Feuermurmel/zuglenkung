@@ -27,11 +27,11 @@ public class ComparatorUtil {
 	// Comparator that extracts a key from values and compares these keys instead
 	public abstract static class KeyComparator<T, K extends Comparable<K>> implements Comparator<T> {
 		private final Comparator<K> keyComparator;
-	
+
 		protected KeyComparator(Comparator<K> keyComparator) {
 			this.keyComparator = keyComparator;
 		}
-	
+
 		protected KeyComparator() {
 			this(new Comparator<K>() {
 				@Override
@@ -40,9 +40,9 @@ public class ComparatorUtil {
 				}
 			});
 		}
-	
+
 		public abstract K getKey(T value);
-	
+
 		@Override
 		public final int compare(T o1, T o2) {
 			return keyComparator.compare(getKey(o1), getKey(o2));

@@ -10,7 +10,7 @@ public final class Orientation2d {
 		this.y = y;
 		this.angle = angle;
 	}
-	
+
 	public Vector2d position() {
 		return Vector2d.create(x, y);
 	}
@@ -34,5 +34,9 @@ public final class Orientation2d {
 	@Override
 	public String toString() {
 		return String.format("Orientation2d(x = %s, y = %s, angle = %s)", x, y, angle);
+	}
+
+	public Orientation2d rotate(double angle) {
+		return create(x, y, this.angle + angle);
 	}
 }

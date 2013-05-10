@@ -31,13 +31,15 @@ public final class Color {
 	public Color brighten(float s) {
 		return blend(white, s);
 	}
-	
+
 	@Deprecated
 	public Color scale(float s) {
 		return darken(1 - s);
 	}
-	
-	/** Values between 0 and 1 make the color whiter. */
+
+	/**
+	 * Values between 0 and 1 make the color whiter.
+	 */
 	@Deprecated
 	public Color shine(float s) {
 		return brighten(s);
@@ -51,11 +53,11 @@ public final class Color {
 	public String toString() {
 		return String.format("Color(%f, %f, %f)", r, g, b);
 	}
-	
+
 	public Color blend(Color other, float s) {
 		return create(MathUtil.blend(r, other.r, s), MathUtil.blend(g, other.g, s), MathUtil.blend(b, other.b, s));
 	}
-	
+
 	public java.awt.Color asAWTColor() {
 		return new java.awt.Color(r, g, b);
 	}

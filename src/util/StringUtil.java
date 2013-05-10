@@ -1,6 +1,5 @@
 package util;
 
-
 import java.util.*;
 
 public class StringUtil {
@@ -32,34 +31,37 @@ public class StringUtil {
 	public static String listToString(Collection<?> list) {
 		return String.format("[%s]", joinToString(", ", list));
 	}
-	
+
 	public static String byteArrayToHexString(byte[] data) {
 		StringBuilder builder = new StringBuilder("0x");
 
-		for (byte i : data)
+		for (byte i : data) {
 			builder.append(String.format("%02x", i));
-		
+		}
+
 		return builder.toString();
 	}
-	
+
 	public static List<Character> characters(String string) {
 		List<Character> res = new ArrayList<Character>(string.length());
 
-		for (int i = 0; i < string.length(); i += 1)
+		for (int i = 0; i < string.length(); i += 1) {
 			res.add(string.charAt(i));
-		
+		}
+
 		return res;
 	}
-	
+
 	public static String repeat(String string, int count) {
 		StringBuilder builder = new StringBuilder();
 
-		for (int i = 0; i < count; i += 1)
-			builder.append(string); 
-		
+		for (int i = 0; i < count; i += 1) {
+			builder.append(string);
+		}
+
 		return builder.toString();
 	}
-	
+
 	//public static String format(String format, Object... objects) {
 	//	String[] values = new String[objects.length];
 	//	

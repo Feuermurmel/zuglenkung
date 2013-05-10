@@ -12,16 +12,17 @@ public class SwingUtil {
 	public static <V> JComboBox comboBox(final List<V> values, ItemViewStrategy<V> strategy, final SingleItemListener<V> listener) {
 		final JComboBox comboBox = new JComboBox();
 
-		for (V i : values)
+		for (V i : values) {
 			comboBox.addItem(strategy.asString(i));
-		
+		}
+
 		comboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				listener.changed(values.get(comboBox.getSelectedIndex()));
 			}
 		});
-		
+
 		return comboBox;
 	}
 

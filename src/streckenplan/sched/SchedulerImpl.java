@@ -12,14 +12,14 @@ final class SchedulerImpl implements Scheduler {
 			return Double.compare(o1.scheduledTime, o2.scheduledTime);
 		}
 	});
-	
+
 	@Override
 	public void step(double delta) {
 		double endTime = currentTime + delta;
-		
+
 		while (currentTime < endTime) {
 			TaskImpl task;
-			
+
 			try {
 				task = tasks.first();
 			} catch (NoSuchElementException ignored) {
@@ -37,16 +37,16 @@ final class SchedulerImpl implements Scheduler {
 
 		currentTime = endTime;
 	}
-	
+
 	@Override
 	public Task post(double delay, Runnable runnable) {
 		TaskImpl task = new TaskImpl(currentTime + delay, runnable);
-		
+
 		tasks.add(task);
-		
+
 		return task;
 	}
-	
+
 	@Override
 	public double getTime() {
 		return currentTime;
@@ -60,7 +60,7 @@ final class SchedulerImpl implements Scheduler {
 			this.scheduledTime = scheduledTime;
 			this.runnable = runnable;
 		}
-		
+
 		@Override
 		public void cancel() {
 			assert tasks.remove(this);

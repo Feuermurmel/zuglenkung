@@ -24,7 +24,7 @@ public final class Vector2d {
 	public Vector2d rotate(double angle) {
 		double cos = Math.cos(angle);
 		double sin = Math.sin(angle);
-		
+
 		return create(x * cos - y * sin, y * cos + x * sin);
 	}
 
@@ -39,7 +39,7 @@ public final class Vector2d {
 	public Vector2d sub(Vector2d vec) {
 		return create(x - vec.x, y - vec.y);
 	}
-	
+
 	public static final Vector2d zero = create(0, 0);
 	public static final Vector2d unitX = create(1, 0);
 	public static final Vector2d unitY = create(0, 1);

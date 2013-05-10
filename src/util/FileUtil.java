@@ -9,8 +9,9 @@ public class FileUtil {
 
 	private FileUtil() {
 	}
-	
+
 	// Stolen and adapted from http://code.google.com/p/guava-libraries/
+
 	/**
 	 * Atomically creates a new directory somewhere beneath the system's
 	 * temporary directory (as defined by the {@code java.io.tmpdir} system
@@ -42,13 +43,14 @@ public class FileUtil {
 
 		throw new IllegalStateException("Failed to create directory");
 	}
-	
+
 	@SuppressWarnings("ConstantConditions")
 	public static void deleteTree(File f) throws IOException {
 		if (f.isDirectory())
-			for (File c : f.listFiles())
+			for (File c : f.listFiles()) {
 				deleteTree(c);
-		
+			}
+
 		if (!f.delete())
 			if (f.exists())
 				throw new IOException("Failed to delete file: " + f);
@@ -61,13 +63,13 @@ public class FileUtil {
 	// FIXME: Should fail if the file already exists.
 	public static void writeFile(File destination, byte[] content) throws IOException {
 		File parent = destination.getParentFile();
-		
+
 		if (!parent.mkdirs())
 			if (!parent.isDirectory())
 				throw new RuntimeException("File.mkdirs() failed.");
-		
+
 		FileOutputStream outputStream = new FileOutputStream(destination);
-		
+
 		try {
 			WritableByteChannel outputChannel = outputStream.getChannel();
 
@@ -76,10 +78,10 @@ public class FileUtil {
 			outputStream.close();
 		}
 	}
-	
+
 	public static byte[] readFileBytes(File source) throws IOException {
 		FileInputStream inputStream = new FileInputStream(source);
-		
+
 		try {
 			ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
 			ReadableByteChannel inputChannel = inputStream.getChannel();
@@ -88,21 +90,21 @@ public class FileUtil {
 
 			while (true) {
 				int res = inputChannel.read(buffer);
-				
+
 				if (res == -1)
 					break;
-				
+
 				buffer.flip();
 				byteArrayChannel.write(buffer);
 				buffer.rewind();
 			}
-			
+
 			return byteArrayStream.toByteArray();
 		} finally {
 			inputStream.close();
 		}
 	}
-	
+
 	public static String readFile(File source) throws IOException {
 		return new String(readFileBytes(source), CharsetUtil.utf8);
 	}

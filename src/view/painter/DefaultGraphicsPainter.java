@@ -2,7 +2,7 @@ package view.painter;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
 
 import types.Color;
@@ -29,7 +29,7 @@ public final class DefaultGraphicsPainter implements Painter {
 	@Override
 	public Rectangle2D getBounds() {
 		Shape deviceBounds = context.graphics.getClip();
-		
+
 		try {
 			return transform.createInverse().createTransformedShape(deviceBounds).getBounds2D();
 		} catch (NoninvertibleTransformException e) {
@@ -41,7 +41,7 @@ public final class DefaultGraphicsPainter implements Painter {
 		checkContext();
 
 		context.graphics.setPaint(color.asAWTColor());
-		
+
 		return context.graphics;
 	}
 
@@ -50,7 +50,7 @@ public final class DefaultGraphicsPainter implements Painter {
 
 		context.graphics.setPaint(color.asAWTColor());
 		context.graphics.setStroke(stroke);
-		
+
 		return context.graphics;
 	}
 
@@ -61,32 +61,30 @@ public final class DefaultGraphicsPainter implements Painter {
 		}
 	}
 
-	public static Painter create(Graphics2D graphics) {
-		return new DefaultGraphicsPainter(new Context(graphics), new AffineTransform());
-	}
-
 	@Override
 	public void draw(Color paint, Stroke stroke, java.util.List<Shape> shapes) {
 		Graphics2D g = getGraphics(paint, stroke);
 
-		for (Shape i : shapes)
+		for (Shape i : shapes) {
 			g.draw(i);
+		}
 	}
 
 	@Override
 	public void fill(Color paint, List<Shape> shapes) {
 		Graphics2D g = getGraphics(paint);
 
-		for (Shape i : shapes)
+		for (Shape i : shapes) {
 			g.fill(i);
+		}
 	}
 
 	// This would support sub-pixel anti-aliasing (only with -Dapple.awt.graphics.UseQuartz=true which may degrade performance substantially) but character placement is not as precise as with ShapeUtil.text()
 	public void text(Vector2d position, Font font, Color color, String text) {
 		Graphics g = getGraphics(color);
-		
+
 		g.setFont(font);
-		
+
 		g.drawString(text, (int) Math.round(position.x), (int) Math.round(position.y));
 	}
 
@@ -113,6 +111,15 @@ public final class DefaultGraphicsPainter implements Painter {
 	@Override
 	public Painter scaled(double factor) {
 		return transformed(AffineTransform.getScaleInstance(factor, factor));
+	}
+
+	@Deprecated
+	public Graphics2D getGraphics() {
+		return context.graphics;
+	}
+
+	public static Painter create(Graphics2D graphics) {
+		return new DefaultGraphicsPainter(new Context(graphics), new AffineTransform());
 	}
 
 	private static final class Context {

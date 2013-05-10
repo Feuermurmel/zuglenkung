@@ -13,9 +13,9 @@ public class StrokeUtil {
 	public static Stroke basic(float width, Cap cap, Join join, @Nullable float[] pattern) {
 		return new BasicStroke(width, cap.magic, join.magic, 10, pattern, 0f);
 	}
-	
+
 	public static Stroke basic(float width, Cap cap, Join join, float pattern) {
-		return basic(width, cap, join, new float[] { pattern, pattern });
+		return basic(width, cap, join, new float[]{ pattern, pattern });
 	}
 
 	public static Stroke basic(float width, Cap cap, Join join) {
@@ -27,7 +27,7 @@ public class StrokeUtil {
 	}
 
 	public static Stroke basic(float width, float pattern) {
-		return basic(width, Cap.butt, Join.round, new float[] { pattern, pattern });
+		return basic(width, Cap.butt, Join.round, new float[]{ pattern, pattern });
 	}
 
 	public static Stroke basic(float width) {

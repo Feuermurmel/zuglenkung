@@ -5,10 +5,11 @@ import java.awt.geom.AffineTransform;
 import javax.swing.*;
 
 import types.Vector2d;
-import view.painter.*;
+import view.painter.DefaultGraphicsPainter;
+import view.painter.Paintable;
 
 import static java.awt.RenderingHints.*;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import static javax.swing.WindowConstants.*;
 
 public final class View {
 	private final Paintable paintable;
@@ -16,11 +17,11 @@ public final class View {
 
 	private View(Paintable paintable) {
 		this.paintable = paintable;
-		
+
 		frame.setSize(500, 320);
 		frame.setResizable(true);
 		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		frame.setContentPane(new JPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
@@ -65,7 +66,7 @@ public final class View {
 			}
 		});
 	}
-	
+
 	public JFrame getFrame() {
 		return frame;
 	}

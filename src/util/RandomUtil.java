@@ -9,12 +9,13 @@ public class RandomUtil {
 	public static <T> List<T> sample(List<T> population, int size) {
 		List<T> res = new ArrayList<T>(size);
 
-		for (int i = 0; i < size; i += 1)
+		for (int i = 0; i < size; i += 1) {
 			res.add(choice(population));
+		}
 
 		return res;
 	}
-	
+
 	public static <T> T choice(List<T> population) {
 		return population.get(random.nextInt(population.size()));
 	}

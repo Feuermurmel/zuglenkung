@@ -1,6 +1,7 @@
 package util;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.*;
@@ -12,9 +13,9 @@ import types.Vector2d;
 public class ShapeUtil {
 	private ShapeUtil() {
 	}
-	
+
 	private static final FontRenderContext fontRenderContext = new FontRenderContext(null, true, true);
-	
+
 	public static Shape circle(Vector2d center, double radius) {
 		return new Ellipse2D.Double(center.x - radius, center.y - radius, radius * 2, radius * 2);
 	}
@@ -23,7 +24,7 @@ public class ShapeUtil {
 		return createPolygonShape(points, false);
 	}
 
-	public static Shape line(Vector2d ... points) {
+	public static Shape line(Vector2d... points) {
 		return line(Arrays.asList(points));
 	}
 
@@ -34,20 +35,20 @@ public class ShapeUtil {
 	public static Shape arc(Vector2d center, double r, double angle1, double angle2) {
 		return new Arc2D.Double(center.x - r, center.y - r, r * 2, r * 2, -angle1 * 360 / MathUtil.tau, (angle1 - angle2) * 360 / MathUtil.tau, Arc2D.OPEN);
 	}
-		
+
 	public static Shape polygon(List<Vector2d> points) {
 		return createPolygonShape(points, true);
 	}
-	
-	public static Shape polygon(Vector2d ... points) {
+
+	public static Shape polygon(Vector2d... points) {
 		return polygon(Arrays.asList(points));
 	}
-	
+
 	public static Shape text(Vector2d position, Font font, String string, double alignment) {
 		GlyphVector glyphVector = font.createGlyphVector(fontRenderContext, string);
 
 		AffineTransform transform = new AffineTransform(1, 0, 0, -1, position.x - glyphVector.getLogicalBounds().getWidth() * alignment, position.y);
-		
+
 		return transform.createTransformedShape(glyphVector.getOutline());
 	}
 
@@ -60,8 +61,9 @@ public class ShapeUtil {
 
 		path.moveTo(points.get(0).x, points.get(0).y);
 
-		for (Vector2d i : points.subList(1, points.size()))
+		for (Vector2d i : points.subList(1, points.size())) {
 			path.lineTo(i.x, i.y);
+		}
 
 		if (closed)
 			path.closePath();

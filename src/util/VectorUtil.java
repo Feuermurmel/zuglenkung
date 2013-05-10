@@ -11,8 +11,8 @@ public class VectorUtil {
 		Vector2d direction2 = Vector2d.fromAngle(angle2);
 
 		double det = direction1.y * direction2.x - direction1.x * direction2.y;
-		double x = -((-(direction1.y * direction2.x * position1.x) + direction1.x * direction2.x * position1.y + direction1.x * direction2.y * position2.x - direction1.x * direction2.x * position2.y)/ det);
-		double y = (direction1.y * direction2.y * position1.x - direction1.x * direction2.y * position1.y - direction1.y * direction2.y * position2.x +	direction1.y * direction2.x * position2.y) / det;
+		double x = -((-(direction1.y * direction2.x * position1.x) + direction1.x * direction2.x * position1.y + direction1.x * direction2.y * position2.x - direction1.x * direction2.x * position2.y) / det);
+		double y = (direction1.y * direction2.y * position1.x - direction1.x * direction2.y * position1.y - direction1.y * direction2.y * position2.x + direction1.y * direction2.x * position2.y) / det;
 
 		return Vector2d.create(x, y);
 	}

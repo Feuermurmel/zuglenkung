@@ -1,7 +1,6 @@
 package streckenplan.main;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -10,8 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
-import streckenplan.implementations.Simulations;
-import streckenplan.interfaces.Simulation;
+import streckenplan.api.Simulation;
+import streckenplan.impl.Simulations;
+import streckenplan.proxy.*;
 import types.Vector2d;
 import util.FileUtil;
 import view.View;
@@ -20,13 +20,17 @@ import view.painter.Painter;
 
 public class MainScript {
 	private final File scriptFile;
-	private Simulation simulation;
-	private SimulationProxy simulationProxy;
+	private Simulation simulation = null;
+	private SimulationProxy simulationProxy = null;
 	private long lastScriptFileLastModifiedTime = 0;
 	private final View view;
 
 	private MainScript(File scriptFile) {
 		this.scriptFile = scriptFile;
+
+		// So that there's always a simulation, will be replaced when a new script version has been loaded successfully.
+		simulation = Simulations.createSimulation();
+		simulationProxy = Proxies.createSimulationProxy(simulation);
 
 		view = View.create(new Paintable() {
 			@Override
@@ -37,15 +41,18 @@ public class MainScript {
 			}
 		});
 
-		// So that there's always a simulation, will be replaced when a new script version has been loaded successfully.
-		simulation = Simulations.createSimulation();
-		simulationProxy = new SimulationProxy(view.getFrame());
+		view.getFrame().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(@NotNull KeyEvent e) {
+				simulationProxy.handleKeyPressed(e);
+			}
+		});
 
 		final float delta = 1f / 24;
 
 		new Timer((int) (delta * 1000), new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
+			public void actionPerformed(@NotNull ActionEvent e) {
 				simulation.step(delta);
 				view.repaint();
 			}
@@ -78,20 +85,18 @@ public class MainScript {
 		System.out.println(String.format("Reloading script %s ...", name));
 
 		Simulation simulation = Simulations.createSimulation();
-		LayoutProxy layoutProxy = new LayoutProxy(simulation.getLayout());
-		SimulationProxy simulationProxy = new SimulationProxy(view.getFrame());
+		SimulationProxy simulationProxy = Proxies.createSimulationProxy(simulation);
+		LuaProxy layoutProxy = Proxies.createLayoutProxy(simulation.getLayout());
 
 		LuaValue _G = JsePlatform.standardGlobals();
-		_G.set("layout", layoutProxy.layout());
-		_G.set("simulation", simulationProxy.simulation());
+		_G.set("layout", layoutProxy.getProxyTable());
+		_G.set("simulation", simulationProxy.getProxyTable());
 
 		try {
 			LoadState.load(new ByteArrayInputStream(script), name, "t", _G).call();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
-		simulationProxy.dispose();
 
 		this.simulation = simulation;
 		this.simulationProxy = simulationProxy;
