@@ -24,7 +24,7 @@ final class TrainImpl implements Train, Steppable, Paintable {
 	TrainImpl(LayoutImpl layout, TrackPosition position) {
 		this.layout = layout;
 		this.position = position;
-		engine = new Engine(1. / 25);
+		engine = new Engine();
 
 		updateCarOrientations();
 
@@ -44,10 +44,16 @@ final class TrainImpl implements Train, Steppable, Paintable {
 
 			if (aspect.speed > 0) {
 				engine.setTargetSpeed(aspect.speed);
-			} else if (aspect.distance > 0) {
-				engine.setTargetSpeed(.4);
-			} else {
-				engine.setTargetSpeed(0);
+			} else if (engine.getTargetSpeed() > 0) {
+				double distance = position.track.length() - position.position;
+
+				if (distance > 0.1) {
+					System.out.println(distance);
+
+					engine.setTargetSpeed(distance * 0.4);
+				} else {
+					engine.setTargetSpeed(0);
+				}
 			}
 		}
 

@@ -37,46 +37,58 @@ final class SimpleSystemNHauptsignalSignalArrangement extends SignalArrangement 
 	@Override
 	public void paint(Painter p, Aspect currentAspect) {
 		float u = 1f / 24;
-		Painter p2 = p.rotated(angle).translated(create(-offset, 0));
+		double r = u * .7;
+		Painter p2 = p.rotated(angle).translated(create(-offset + u, -u * 1.25));
 		Stroke stroke = StrokeUtil.basic(u);
 
 		p2.fill(black,
 				polygon(
-						create(-.75 * u, (1.25 + 4) * u),
-						create(-1.25 * u, (.75 + 4) * u),
+						create(-.75 * u, (1.25 + 8) * u),
+						create(-1.25 * u, (.75 + 8) * u),
 						create(-1.25 * u, -.75 * u),
 						create(-.75 * u, -1.25 * u),
 						create(.75 * u, -1.25 * u),
 						create(1.25 * u, -.75 * u),
-						create(1.25 * u, (.75 + 4) * u),
-						create(.75 * u, (1.25 + 4) * u)));
+						create(1.25 * u, (.75 + 8) * u),
+						create(.75 * u, (1.25 + 8) * u)));
 
 		p2.draw(black, stroke,
 			line(create(-u * 1.5, -u * 4), create(u * 1.5, -u * 4)),
 			line(create(0, -u * 4), create(0, -1.25 * u)));
-
-		float r = u * .6f;
+		
 		Color offColor = gray(.2f);
-
+		
 		// From top to bottom.
 		Color[] colors = {
 				green.brighten(.2f),
 				red.brighten(.2f),
+				red.blend(yellow, .5f).brighten(.2f),
+				green.brighten(.2f),
 				red.blend(yellow, .5f).brighten(.2f) };
 
+		int[] onLamps;
+		
+		if (currentAspect.speed < .4)
+			onLamps = new int[]{ 1 };
+		else if (currentAspect.speed < .6)
+			onLamps = new int[]{ 2 };
+		else if (currentAspect.speed < 1.0)
+			onLamps = new int[]{ 2, 4 };
+		else if (currentAspect.speed < 1.2)
+			onLamps = new int[]{ 0, 2 };
+		else if (currentAspect.speed < 1.4)
+			onLamps = new int[]{ 0, 2, 4 };
+		else if (currentAspect.speed < 1.6)
+			onLamps = new int[]{ 0, 3 };
+		else
+			onLamps = new int[]{ 0 };
+		
 		boolean[] lamps = new boolean[colors.length];
 
-		if (currentAspect.speed < .4) {
-			lamps[1] = true;
-		} else if (currentAspect.speed < 1.0) {
-			lamps[0] = true;
-			lamps[2] = true;
-		} else {
-			lamps[0] = true;
-		}
-
-		for (int i = 0; i < lamps.length; i += 1) {
+		for (int i : onLamps)
+			lamps[i] = true;
+		
+		for (int i = 0; i < lamps.length; i += 1)
 			p2.fill(lamps[i] ? colors[i] : offColor, circle(create(0, (lamps.length - i - 1) * 2 * u), r));
-		}
 	}
 }

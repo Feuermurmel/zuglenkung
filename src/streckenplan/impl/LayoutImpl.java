@@ -174,11 +174,9 @@ final class LayoutImpl implements Paintable, Layout, Steppable {
 
 		map.keySet().removeAll(processedFields);
 
-		for (List<Runnable> i : runnables) {
-			for (Runnable j : i) {
+		for (List<Runnable> i : runnables)
+			for (Runnable j : i)
 				j.run();
-			}
-		}
 	}
 
 	private static final double fieldHeightRatio = Math.sqrt(3) / 2;

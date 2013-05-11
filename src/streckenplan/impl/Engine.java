@@ -1,21 +1,26 @@
 package streckenplan.impl;
 
 import streckenplan.sched.Steppable;
+import util.MathUtil;
 
 final class Engine implements Steppable {
+	private final double maxAcceleration;
 	private final double maxPowerPerMass;
 	private final double maxBreakDeceleration;
+	private final double maxBreakPowerPerMass;
 	private final double freeWheelingDeceleration;
-	//private final double freeWheelingPowerPerMass;
+	private final double airResistance;
 
 	private double currentSpeed = 0;
 	private double targetSpeed = 0;
 
-	Engine(double maxPowerPerMass) {
-		this.maxPowerPerMass = maxPowerPerMass;
-		maxBreakDeceleration = 1. / 10;
-		freeWheelingDeceleration = 1. / 100;
-		//freeWheelingPowerPerMass = 1. / 10;
+	Engine() {
+		maxAcceleration = .1;
+		maxPowerPerMass = .2;
+		maxBreakDeceleration = .1;
+		maxBreakPowerPerMass = .2;
+		freeWheelingDeceleration = .01;
+		airResistance = .01;
 	}
 
 	public void setTargetSpeed(double value) {
@@ -28,35 +33,16 @@ final class Engine implements Steppable {
 
 	@Override
 	public void step(double delta) {
-		double nextSpeed = currentSpeed;
+		double maxAcceleration = MathUtil.clamp(0, this.maxAcceleration, maxPowerPerMass / (2 * currentSpeed) - freeWheelingDeceleration - airResistance * currentSpeed);
+		double maxDeceleration = MathUtil.clamp(0, maxBreakDeceleration, maxBreakPowerPerMass / (2 * currentSpeed) + freeWheelingDeceleration + airResistance * currentSpeed);
 
-		nextSpeed = addAcceleration(nextSpeed, delta, -freeWheelingDeceleration);
-
-		if (currentSpeed > targetSpeed) {
-			nextSpeed = addAcceleration(nextSpeed, delta, -maxBreakDeceleration);
-
-			if (nextSpeed < 0)
-				nextSpeed = 0;
-		} else {
-			nextSpeed = addPowerPerMass(nextSpeed, delta, maxPowerPerMass);
-
-			if (nextSpeed > targetSpeed)
-				nextSpeed = targetSpeed;
-		}
-
-		currentSpeed = nextSpeed;
+		double maxNextSpeed = currentSpeed + maxAcceleration * delta;
+		double minNextSpeed = currentSpeed - maxDeceleration * delta;
+		
+		currentSpeed = MathUtil.clamp(minNextSpeed, maxNextSpeed, targetSpeed);
 	}
 
-	private static double addPowerPerMass(double speed, double delta, double powerPerMass) {
-		double v2 = speed * speed + powerPerMass * delta * 2;
-
-		if (v2 > 0)
-			return Math.sqrt(v2);
-		else
-			return 0;
-	}
-
-	private static double addAcceleration(double speed, double delta, double acceleration) {
-		return speed + acceleration * delta;
+	public double getTargetSpeed() {
+		return targetSpeed;
 	}
 }

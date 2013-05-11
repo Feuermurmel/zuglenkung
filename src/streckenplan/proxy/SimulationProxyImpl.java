@@ -25,7 +25,7 @@ final class SimulationProxyImpl implements SimulationProxy {
 	public LuaValue getProxyTable() {
 		LuaValue res = tableOf();
 
-		res.set("addKeyHandler", new TwoArgFunction() {
+		res.set("setKeyHandler", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg1, LuaValue arg2) {
 				String key = arg1.checkjstring();

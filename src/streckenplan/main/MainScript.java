@@ -22,6 +22,7 @@ public class MainScript {
 	private final File scriptFile;
 	private Simulation simulation = null;
 	private SimulationProxy simulationProxy = null;
+	private Timer simulationTimer = null;
 	private long lastScriptFileLastModifiedTime = 0;
 	private final View view;
 
@@ -35,28 +36,21 @@ public class MainScript {
 		view = View.create(new Paintable() {
 			@Override
 			public void paint(Painter p) {
-				Painter painter = p.translated(Vector2d.create(1. / 2, 1. / 2)).scaled(16 * 3).translated(Vector2d.create(1, 1));
+				if (simulation != null) {
+					Painter painter = p.translated(Vector2d.create(1. / 2, 1. / 2)).scaled(16 * 3).translated(Vector2d.create(1, 1));
 
-				simulation.getPaintable().paint(painter);
+					simulation.getPaintable().paint(painter);	
+				}
 			}
 		});
 
 		view.getFrame().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(@NotNull KeyEvent e) {
-				simulationProxy.handleKeyPressed(e);
+				if (simulationProxy != null)
+					simulationProxy.handleKeyPressed(e);
 			}
 		});
-
-		final float delta = 1f / 24;
-
-		new Timer((int) (delta * 1000), new ActionListener() {
-			@Override
-			public void actionPerformed(@NotNull ActionEvent e) {
-				simulation.step(delta);
-				view.repaint();
-			}
-		}).start();
 	}
 
 	private void start() {
@@ -92,14 +86,31 @@ public class MainScript {
 		_G.set("layout", layoutProxy.getProxyTable());
 		_G.set("simulation", simulationProxy.getProxyTable());
 
-		try {
-			LoadState.load(new ByteArrayInputStream(script), name, "t", _G).call();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (script != null) {
+			try {
+				LoadState.load(new ByteArrayInputStream(script), name, "t", _G).call();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
-
+		
 		this.simulation = simulation;
 		this.simulationProxy = simulationProxy;
+		
+		if (simulationTimer != null)
+			simulationTimer.stop();
+
+		final float delta = 1f / 24;
+
+		simulationTimer = new Timer((int) (delta * 1000), new ActionListener() {
+			@Override
+			public void actionPerformed(@NotNull ActionEvent e) {
+				MainScript.this.simulation.step(delta);
+				view.repaint();
+			}
+		});
+		
+		simulationTimer.start();
 	}
 
 	public static void main(String[] args) {

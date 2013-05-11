@@ -24,13 +24,13 @@ do
 		addTrack('curve-left')
 	end
 	
-	for i = 1, 10 do
+	for i = 1, 9 do
 		addTrack('straight')
 	end
 	
 	addTurnaround()
 	
-	for i = 1, 10 do
+	for i = 1, 9 do
 		addTrack('straight')
 	end
 	
@@ -51,16 +51,19 @@ local function nextTrack(track)
 end
 
 local function maxSpeedForDistance(distance)
-	if distance >= 4 then
-		return 1.6
-	--elseif distance >= 2 then
-	--	return 0.6
-	elseif distance >= 1 then
-		return 0.4
-	else
-		return 0.0
+	local data = {{0.8,0.4},{1.8,0.6},{5.,1.},{7.2,1.2},{9.8,1.4},{12.8,1.6}}
+	local foundMaxSpeed = 0.0
+	
+	for _, i in ipairs(data) do
+		local d, s = table.unpack(i)
+		
+		if d < distance - 0.1 and s > foundMaxSpeed then
+			foundMaxSpeed = s
+		end
 	end
-end
+	
+	return foundMaxSpeed
+end 
 
 local function manageTrain(track, safeDistanceFn)
 	track.getField().awaitState('free', function ()
@@ -68,21 +71,23 @@ local function manageTrain(track, safeDistanceFn)
 		local nextTrack = nextTrack(track)
 		local done = false
 
-		manageTrain(nextTrack, function (safeDistance)
+		manageTrain(nextTrack, function (safeDistance, nextMaxSpeed)
 			if not done then
-				safeDistanceFn(safeDistance + 1)
+				safeDistance = safeDistance + 1
 
 				if affectingSignal then
-					print('distance', safeDistance)
-					affectingSignal.setAspect({ distance = 0, speed = maxSpeedForDistance(safeDistance) })
+					affectingSignal.setAspect({ distance = 0, speed = nextMaxSpeed })
+
+					nextMaxSpeed = maxSpeedForDistance(safeDistance)
 				end
+
+				safeDistanceFn(safeDistance, nextMaxSpeed)
 			end
 		end)
 
 		if affectingSignal then
-			print('halt')
 			affectingSignal.setAspect(haltAspect)
-			safeDistanceFn(1)
+			safeDistanceFn(1, .4)
 		end
 		
 		simulation.setColor(track, { 1, 1, 0 })
@@ -90,9 +95,9 @@ local function manageTrain(track, safeDistanceFn)
 		track.getField().awaitState('occupied', function ()
 			track.getField().awaitState('free', function ()
 				simulation.setColor(track, { 1, 1, 1 })
-				done = true
+				done = true 
 			end)
-		end)
+		end) 
 	end)
 end 
 
@@ -105,35 +110,38 @@ for i = 1, #tracks do
 	if i % 3 == 0 then
 		tracks[i].addSignal('system-l')
 	end
+end
 
-	--if i % 4 == 0 then
-	--	tracks[i].reverse().addSignal('dwarf')
-	--end
+do
+	for _, i in ipairs({ 7, 10, 13, 26 }) do 
+		local track = tracks[i]
+		local train = track.addTrain(.8);
 	
---	if i % 6 == 0 then
+		train.addCar(.8)
+		train.setTargetSpeed(.4);
+	
+		manageTrain(nextTrack(track), function () end)
+	end
+	
+	local train = tracks[1].addTrain(.8)
+	train.setTargetSpeed(.4); 
+	
+	simulation.setKeyHandler('k', function ()
+		train.setTargetSpeed(0)
+	end)
 end
 
-for _, i in ipairs({ 1, 7 }) do
-	local track = tracks[i]
-	local train = track.addTrain(.8);
+do
+	local tracks = { }
 
-	train.addCar(.8)
-	train.setTargetSpeed(.4);
+	for i = 1, 40 do
+		tracks[i] = center.getNeighbour('ru', 4).getNeighbour('r', i - 3).getEdge('l').addTrack('straight')
+	end
 
-	manageTrain(nextTrack(track), function () end)
+	tracks[2].addTrain(.8).setTargetSpeed(.4)
+	--tracks[12].addSignal('dwarf').setAspect({ distance = 0, speed = .4 })
+	tracks[4].addSignal('dwarf').setAspect({ distance = 0, speed = 0 })
 end
-
---do
---	local tracks = { }
---
---	for i = 1, 40 do
---		tracks[i] = center.getNeighbour('ru', 2).getNeighbour('r', i - 2).getEdge('l').addTrack('straight')
---	end
---
---	tracks[2].addTrain(.8).setTargetSpeed(1.0)
---	tracks[12].addSignal('dwarf').setAspect({ distance = 0, speed = .4 })
---	tracks[16].addSignal('dwarf').setAspect({ distance = 0, speed = 0 })
---end
 
 --(function ()
 --	local tracks = { }
